@@ -4,6 +4,15 @@ A reference implementation for a scalable, serverless data ingestion and analyti
 
 ![Architecture Diagram](docs/architecture_diagram.png)
 
+### Data Flow Explained
+
+1.  **Ingest**: Users or apps upload JSON logs to the **Landing S3 Bucket**.
+2.  **Transform**: This upload triggers the **Transformer Lambda**, which converts the JSON to optimized Parquet format and saves it to the **Clean S3 Bucket**.
+3.  **Load & Serve**:
+    *   The **Loader Lambda** (triggered by new Parquet files) reads the clean data.
+    *   It selectively writes to **DynamoDB** (for fast lookups), **RDS Postgres** (for SQL analytics), and **OpenSearch** (for full-text search).
+4.  **Scale (Optional)**: High-volume streams can enter via **Kinesis** to buffer traffic before it hits S3. **Glue** jobs can later process historical data in bulk.
+
 ## Overview
 
 This repository demonstrates a production-grade pattern for ingesting high-volume JSON logs, converting them into optimized Parquet logs, and making them available for analytics across multiple storage engines (S3, DynamoDB, Postgres, and OpenSearch).
